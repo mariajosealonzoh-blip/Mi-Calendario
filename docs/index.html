@@ -6,12 +6,14 @@
   <title>Mi Calendario</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, #f8f9fa, #f0f2f5);
       min-height: 100vh;
       padding: 20px;
     }
+
     .container {
       max-width: 1020px;
       margin: 0 auto;
@@ -20,9 +22,11 @@
       box-shadow: 0 4px 20px rgba(0,0,0,0.08);
       overflow: hidden;
     }
+
+    /* ── HEADER ── */
     .header {
       background: linear-gradient(135deg, #A9BDD9, #BDAED6);
-      padding: 26px 32px;
+      padding: 24px 32px;
       color: white;
       display: flex;
       justify-content: space-between;
@@ -30,7 +34,7 @@
       flex-wrap: wrap;
       gap: 14px;
     }
-    .header h1 { font-size: 24px; font-weight: 600; }
+    .header h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.3px; }
     .badge {
       background: rgba(255,255,255,0.25);
       padding: 6px 14px;
@@ -42,7 +46,7 @@
       background: rgba(255,255,255,0.2);
       border: 2px solid white;
       color: white;
-      padding: 8px 18px;
+      padding: 7px 16px;
       border-radius: 8px;
       cursor: pointer;
       font-size: 13px;
@@ -51,7 +55,33 @@
       transition: background 0.2s;
     }
     .btn-logout:hover { background: rgba(255,255,255,0.35); }
-    .content { padding: 28px 32px; }
+
+    /* ── TABS ── */
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid #f0f0f0;
+      padding: 0 32px;
+      gap: 0;
+      display: none;
+    }
+    .tab {
+      padding: 14px 22px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #aaa;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .tab:hover { color: #A9BDD9; }
+    .tab.active { color: #A9BDD9; border-bottom-color: #A9BDD9; font-weight: 600; }
+
+    /* ── CONTENT ── */
+    .content { padding: 24px 32px; }
+
+    /* ── LOGIN ── */
     .login-box { text-align: center; padding: 70px 20px; }
     .login-box h2 { color: #A9BDD9; font-size: 22px; margin-bottom: 10px; }
     .login-box p { color: #999; font-size: 14px; line-height: 1.7; margin-bottom: 32px; max-width: 360px; margin-left: auto; margin-right: auto; }
@@ -68,7 +98,12 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
     .btn-google:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.14); transform: translateY(-1px); }
-    #calendarView { display: none; }
+
+    /* ── PANEL VIEWS ── */
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* ── FILTROS ── */
     .filters { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
     .filter-label { color: #aaa; font-size: 13px; }
     .chip {
@@ -88,33 +123,116 @@
     }
     .chip.on { border-color: var(--c); background: color-mix(in srgb, var(--c) 12%, white); }
     .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--c); flex-shrink: 0; }
+
+    /* ── CONTROLES ── */
     .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
     .month-nav { display: flex; align-items: center; gap: 12px; }
     .btn-nav { background: #BFD8C8; color: white; border: none; padding: 7px 15px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: opacity 0.2s; }
     .btn-nav:hover { opacity: 0.8; }
     .month-title { color: #A9BDD9; font-size: 16px; font-weight: 600; min-width: 155px; text-align: center; }
-    .btn-export { background: #E6B0C2; color: white; border: none; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: opacity 0.2s; }
+
+    .export-group { display: flex; gap: 8px; }
+    .btn-export {
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: opacity 0.2s;
+    }
     .btn-export:hover { opacity: 0.85; }
-    .cal-wrap { border: 1px solid #eee; border-radius: 12px; padding: 16px; margin-bottom: 24px; overflow-x: auto; }
+    .btn-csv { background: #E6B0C2; }
+    .btn-pdf { background: #BDAED6; }
+
+    /* ── GRID CALENDARIO ── */
+    .cal-wrap { border: 1px solid #eee; border-radius: 12px; padding: 16px; overflow-x: auto; }
     .wd-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-bottom: 6px; }
     .wd { text-align: center; font-size: 11px; font-weight: 700; color: #A9BDD9; padding: 8px 0; text-transform: uppercase; letter-spacing: 0.7px; }
     .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
-    .day-cell { background: #fafafa; border: 1px solid #eee; border-radius: 8px; padding: 9px; min-height: 88px; overflow: hidden; transition: border-color 0.2s; }
+    .day-cell {
+      background: #fafafa;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 9px;
+      min-height: 88px;
+      transition: border-color 0.2s;
+      overflow: visible;
+    }
     .day-cell:hover { border-color: #A9BDD9; }
     .day-cell.faded { opacity: 0.3; }
     .day-cell.today { background: #FFFBEE; border: 2px solid #EDE2B8; }
     .day-num { font-size: 12px; font-weight: 700; color: #A9BDD9; margin-bottom: 5px; }
     .ev-pills { display: flex; flex-direction: column; gap: 3px; }
-    .pill { font-size: 10px; font-weight: 500; padding: 2px 5px; border-radius: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-left: 3px solid var(--c); background: color-mix(in srgb, var(--c) 13%, white); color: #333; }
-    .more { font-size: 10px; color: #bbb; padding: 1px 4px; }
-    .week-box { border: 1px solid #eee; border-radius: 12px; padding: 22px; }
-    .week-box h3 { color: #A9BDD9; font-size: 15px; font-weight: 600; margin-bottom: 16px; }
-    .ev-card { padding: 13px 15px; border-left: 4px solid var(--c); background: color-mix(in srgb, var(--c) 7%, white); border-radius: 8px; margin-bottom: 10px; transition: transform 0.15s; }
+    .pill {
+      font-size: 10px;
+      font-weight: 500;
+      padding: 2px 5px;
+      border-radius: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      border-left: 3px solid var(--c);
+      background: color-mix(in srgb, var(--c) 13%, white);
+      color: #333;
+    }
+
+    /* ── SEMANA ── */
+    .ev-card {
+      padding: 13px 15px;
+      border-left: 4px solid var(--c);
+      background: color-mix(in srgb, var(--c) 7%, white);
+      border-radius: 8px;
+      margin-bottom: 10px;
+      transition: transform 0.15s;
+    }
     .ev-card:last-child { margin-bottom: 0; }
     .ev-card:hover { transform: translateX(4px); }
     .ev-card-title { font-weight: 600; color: #333; font-size: 14px; margin-bottom: 4px; }
     .ev-card-time  { font-size: 12px; color: #777; margin-bottom: 3px; }
     .ev-card-cal   { font-size: 11px; color: var(--c); font-weight: 600; }
+
+    /* ── TAREAS ── */
+    .task-list-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #A9BDD9;
+      margin: 20px 0 10px 0;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .task-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      background: #fafafa;
+      border: 1px solid #eee;
+      transition: all 0.2s;
+    }
+    .task-item:hover { border-color: #BFD8C8; background: color-mix(in srgb, #BFD8C8 6%, white); }
+    .task-item.done { opacity: 0.5; }
+    .task-check {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid #BFD8C8;
+      flex-shrink: 0;
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: #BFD8C8;
+    }
+    .task-check.done { background: #BFD8C8; color: white; }
+    .task-title { font-size: 14px; color: #333; font-weight: 500; }
+    .task-title.done { text-decoration: line-through; color: #aaa; }
+    .task-due { font-size: 11px; color: #aaa; margin-top: 3px; }
+
     .empty { text-align: center; padding: 30px; color: #ccc; font-size: 13px; }
     .loading-msg { text-align: center; padding: 30px; color: #A9BDD9; font-size: 13px; }
   </style>
@@ -122,20 +240,37 @@
 <body>
 
 <div class="container">
+  <!-- HEADER sin ícono -->
   <div class="header">
-    <h1>📅 Mi Calendario</h1>
+    <h1>Mi Calendario</h1>
     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
       <span id="badge" class="badge"></span>
       <button id="logoutBtn" class="btn-logout">Cerrar sesión</button>
     </div>
   </div>
+
+  <!-- PESTAÑAS -->
+  <div class="tabs" id="tabsRow">
+    <div class="tab active" data-tab="week">Mi agenda de la semana</div>
+    <div class="tab" data-tab="cal">Calendario</div>
+    <div class="tab" data-tab="tasks">Tareas</div>
+  </div>
+
   <div class="content">
+    <!-- LOGIN -->
     <div id="loginView" class="login-box">
       <h2>Conecta tu Google Calendar</h2>
       <p>Autoriza el acceso una sola vez para ver toda tu agenda real en este widget.</p>
       <button id="loginBtn" class="btn-google">🔐 Conectar con Google</button>
     </div>
-    <div id="calendarView">
+
+    <!-- PANEL: ESTA SEMANA -->
+    <div id="panelWeek" class="panel active" style="display:none;">
+      <div id="weekList"><div class="loading-msg">Cargando…</div></div>
+    </div>
+
+    <!-- PANEL: CALENDARIO -->
+    <div id="panelCal" class="panel" style="display:none;">
       <div class="filters" id="filtersRow">
         <span class="filter-label">Calendarios:</span>
       </div>
@@ -145,58 +280,71 @@
           <div class="month-title" id="monthTitle"></div>
           <button class="btn-nav" id="nextBtn">Siguiente →</button>
         </div>
-        <button class="btn-export" id="exportBtn">📥 Exportar CSV</button>
+        <div class="export-group">
+          <button class="btn-export btn-csv" id="exportCsvBtn">📥 CSV</button>
+          <button class="btn-export btn-pdf" id="exportPdfBtn">📄 PDF</button>
+        </div>
       </div>
       <div class="cal-wrap">
         <div class="wd-row" id="wdRow"></div>
         <div class="days-grid" id="daysGrid"></div>
       </div>
-      <div class="week-box">
-        <h3>📌 Esta semana</h3>
-        <div id="weekList"><div class="loading-msg">Cargando…</div></div>
-      </div>
+    </div>
+
+    <!-- PANEL: TAREAS -->
+    <div id="panelTasks" class="panel" style="display:none;">
+      <div id="tasksList"><div class="loading-msg">Cargando tareas…</div></div>
     </div>
   </div>
 </div>
 
-<!-- IMPORTANTE: el script de la app va PRIMERO, antes de cargar Google -->
+<!-- App script PRIMERO — antes de cargar Google -->
 <script>
-  const CLIENT_ID = '942520492430-uniim142p2pj7r2hqkpsi3ld4cg3d6v2.apps.googleusercontent.com';
-  const SCOPE     = 'https://www.googleapis.com/auth/calendar.readonly';
-  const DISCOVERY = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
-  const PALETTE   = ['#A9BDD9','#BDAED6','#E6B0C2','#BFD8C8','#EDE2B8','#B8D8D8'];
-  const MONTHS    = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-  const DAYS      = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const CLIENT_ID  = '942520492430-uniim142p2pj7r2hqkpsi3ld4cg3d6v2.apps.googleusercontent.com';
+  const SCOPE      = 'https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/tasks.readonly';
+  const DISC_CAL   = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
+  const DISC_TASKS = 'https://www.googleapis.com/discovery/v1/apis/tasks/v1/rest';
+  const PALETTE    = ['#A9BDD9','#BDAED6','#E6B0C2','#BFD8C8','#EDE2B8','#B8D8D8'];
+  const MONTHS     = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const DAYS       = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
 
-  let tokenClient;
-  let gapiReady     = false;
-  let gisReady      = false;
-  let allEvents     = [];
-  let calMeta       = {};
-  let activeFilters = {};
-  let currentDate   = new Date();
+  var tokenClient;
+  var gapiReady     = false;
+  var gisReady      = false;
+  var allEvents     = [];
+  var allTasks      = [];
+  var calMeta       = {};
+  var activeFilters = {};
+  var currentDate   = new Date();
+  var activeTab     = 'week';
 
-  const loginView  = document.getElementById('loginView');
-  const calView    = document.getElementById('calendarView');
-  const loginBtn   = document.getElementById('loginBtn');
-  const logoutBtn  = document.getElementById('logoutBtn');
-  const badge      = document.getElementById('badge');
-  const filtersRow = document.getElementById('filtersRow');
-  const monthTitle = document.getElementById('monthTitle');
-  const wdRow      = document.getElementById('wdRow');
-  const daysGrid   = document.getElementById('daysGrid');
-  const weekList   = document.getElementById('weekList');
-  const exportBtn  = document.getElementById('exportBtn');
-  const prevBtn    = document.getElementById('prevBtn');
-  const nextBtn    = document.getElementById('nextBtn');
+  // DOM refs
+  var loginView    = document.getElementById('loginView');
+  var tabsRow      = document.getElementById('tabsRow');
+  var badge        = document.getElementById('badge');
+  var logoutBtn    = document.getElementById('logoutBtn');
+  var loginBtn     = document.getElementById('loginBtn');
+  var filtersRow   = document.getElementById('filtersRow');
+  var monthTitle   = document.getElementById('monthTitle');
+  var wdRow        = document.getElementById('wdRow');
+  var daysGrid     = document.getElementById('daysGrid');
+  var weekList     = document.getElementById('weekList');
+  var tasksList    = document.getElementById('tasksList');
+  var exportCsvBtn = document.getElementById('exportCsvBtn');
+  var exportPdfBtn = document.getElementById('exportPdfBtn');
+  var prevBtn      = document.getElementById('prevBtn');
+  var nextBtn      = document.getElementById('nextBtn');
+  var panelWeek    = document.getElementById('panelWeek');
+  var panelCal     = document.getElementById('panelCal');
+  var panelTasks   = document.getElementById('panelTasks');
 
-  // ── Estas funciones son llamadas por onload de los scripts de Google ──
+  /* ── GOOGLE API CALLBACKS ── */
   function onGapiLoad() {
     gapi.load('client', function() {
-      gapi.client.init({ discoveryDocs: [DISCOVERY] }).then(function() {
+      gapi.client.init({ discoveryDocs: [DISC_CAL, DISC_TASKS] }).then(function() {
         gapiReady = true;
         tryStart();
-      });
+      }).catch(function(e){ console.error('gapi init error:', e); });
     });
   }
 
@@ -217,27 +365,48 @@
 
   function onToken(resp) {
     if (resp.error) { console.error('Token error:', resp.error); return; }
-    showCal();
+    showApp();
     fetchAll();
   }
 
-  // ── Vistas ──
+  /* ── VISTAS ── */
   function showLogin() {
-    loginView.style.display = 'block';
-    calView.style.display   = 'none';
-    badge.style.display     = 'none';
-    logoutBtn.style.display = 'none';
+    loginView.style.display  = 'block';
+    tabsRow.style.display    = 'none';
+    panelWeek.style.display  = 'none';
+    panelCal.style.display   = 'none';
+    panelTasks.style.display = 'none';
+    badge.style.display      = 'none';
+    logoutBtn.style.display  = 'none';
   }
 
-  function showCal() {
+  function showApp() {
     loginView.style.display = 'none';
-    calView.style.display   = 'block';
+    tabsRow.style.display   = 'flex';
     badge.style.display     = 'inline-block';
     badge.textContent       = '✓ Conectado';
     logoutBtn.style.display = 'inline-block';
+    switchTab('week');
   }
 
-  // ── Botones ──
+  /* ── TABS ── */
+  document.querySelectorAll('.tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      switchTab(tab.getAttribute('data-tab'));
+    });
+  });
+
+  function switchTab(name) {
+    activeTab = name;
+    document.querySelectorAll('.tab').forEach(function(t) {
+      t.classList.toggle('active', t.getAttribute('data-tab') === name);
+    });
+    panelWeek.style.display  = name === 'week'  ? 'block' : 'none';
+    panelCal.style.display   = name === 'cal'   ? 'block' : 'none';
+    panelTasks.style.display = name === 'tasks' ? 'block' : 'none';
+  }
+
+  /* ── AUTH BUTTONS ── */
   loginBtn.addEventListener('click', function() {
     tokenClient.requestAccessToken({ prompt: 'consent' });
   });
@@ -246,21 +415,28 @@
     var t = gapi.client.getToken();
     if (t) google.accounts.oauth2.revoke(t.access_token, function(){});
     gapi.client.setToken(null);
-    allEvents = []; calMeta = {}; activeFilters = {};
+    allEvents = []; allTasks = []; calMeta = {}; activeFilters = {};
     clearChips();
     showLogin();
   });
 
-  // ── Fetch calendarios y eventos reales ──
+  /* ── FETCH DATOS REALES ── */
   async function fetchAll() {
-    weekList.innerHTML = '<div class="loading-msg">Cargando tu calendario…</div>';
-    daysGrid.innerHTML = '<div style="grid-column:1/-1" class="loading-msg">Cargando…</div>';
+    weekList.innerHTML  = '<div class="loading-msg">Cargando tu agenda…</div>';
+    daysGrid.innerHTML  = '<div style="grid-column:1/-1" class="loading-msg">Cargando…</div>';
+    tasksList.innerHTML = '<div class="loading-msg">Cargando tareas…</div>';
 
+    await Promise.all([fetchCalendars(), fetchTasks()]);
+    render();
+  }
+
+  async function fetchCalendars() {
     try {
       var listResp = await gapi.client.calendar.calendarList.list();
       var cals     = listResp.result.items || [];
-
-      allEvents = []; calMeta = {}; activeFilters = {};
+      allEvents    = [];
+      calMeta      = {};
+      activeFilters = {};
 
       cals.forEach(function(cal, i) {
         var color = cal.backgroundColor || PALETTE[i % PALETTE.length];
@@ -286,21 +462,46 @@
           (r.result.items || []).forEach(function(ev) {
             allEvents.push(Object.assign({}, ev, { _calId: cal.id }));
           });
-        } catch(e) {
-          console.warn('No se pudo cargar:', cal.summary, e);
-        }
+        } catch(e) { console.warn('Error en calendario:', cal.summary, e); }
       }));
 
-      render();
-
-    } catch(e) {
-      console.error('Error en fetchAll:', e);
-      weekList.innerHTML = '<div class="empty">Error al cargar. Intenta cerrar sesión y volver a entrar.</div>';
-      daysGrid.innerHTML = '';
-    }
+    } catch(e) { console.error('Error fetchCalendars:', e); }
   }
 
-  // ── Chips de filtro ──
+  async function fetchTasks() {
+    try {
+      var listsResp = await gapi.client.tasks.tasklists.list({ maxResults: 20 });
+      var lists     = listsResp.result.items || [];
+      allTasks      = [];
+
+      await Promise.all(lists.map(async function(list) {
+        try {
+          var r = await gapi.client.tasks.tasks.list({
+            tasklist:    list.id,
+            showHidden:  false,
+            maxResults:  100,
+          });
+          (r.result.items || []).forEach(function(task) {
+            allTasks.push(Object.assign({}, task, { _listName: list.title }));
+          });
+        } catch(e) { console.warn('Error en lista de tareas:', list.title, e); }
+      }));
+
+    } catch(e) { console.error('Error fetchTasks:', e); }
+  }
+
+  /* ── RENDER ── */
+  function render() {
+    renderGrid();
+    renderWeek();
+    renderTasks();
+  }
+
+  function visible() {
+    return allEvents.filter(function(ev){ return activeFilters[ev._calId]; });
+  }
+
+  /* ── CHIPS ── */
   function clearChips() {
     filtersRow.querySelectorAll('.chip').forEach(function(c){ c.remove(); });
   }
@@ -322,16 +523,7 @@
     });
   }
 
-  // ── Render ──
-  function visible() {
-    return allEvents.filter(function(ev){ return activeFilters[ev._calId]; });
-  }
-
-  function render() {
-    renderGrid();
-    renderWeek();
-  }
-
+  /* ── GRID MENSUAL ── */
   function renderGrid() {
     wdRow.innerHTML    = '';
     daysGrid.innerHTML = '';
@@ -379,7 +571,8 @@
     var pillWrap = document.createElement('div');
     pillWrap.className = 'ev-pills';
 
-    evs.slice(0, 3).forEach(function(ev) {
+    // Mostrar TODOS los eventos, sin límite
+    evs.forEach(function(ev) {
       var color = (calMeta[ev._calId] && calMeta[ev._calId].color) || '#A9BDD9';
       var p = document.createElement('div');
       p.className = 'pill';
@@ -389,21 +582,18 @@
       pillWrap.appendChild(p);
     });
 
-    if (evs.length > 3) {
-      var m = document.createElement('div');
-      m.className = 'more';
-      m.textContent = '+' + (evs.length - 3) + ' más';
-      pillWrap.appendChild(m);
-    }
-
     cell.appendChild(pillWrap);
     return cell;
   }
 
+  /* ── ESTA SEMANA ── */
   function renderWeek() {
     var today = new Date();
-    var start = new Date(today); start.setDate(today.getDate() - today.getDay()); start.setHours(0,0,0,0);
-    var end   = new Date(start); end.setDate(start.getDate() + 7);
+    var start = new Date(today);
+    start.setDate(today.getDate() - today.getDay());
+    start.setHours(0,0,0,0);
+    var end = new Date(start);
+    end.setDate(start.getDate() + 7);
 
     var evs = visible().filter(function(ev) {
       var dt = new Date(ev.start.dateTime || ev.start.date);
@@ -437,8 +627,60 @@
     });
   }
 
-  // ── Export CSV ──
-  exportBtn.addEventListener('click', function() {
+  /* ── TAREAS ── */
+  function renderTasks() {
+    if (!allTasks.length) {
+      tasksList.innerHTML = '<div class="empty">No se encontraron tareas.</div>';
+      return;
+    }
+
+    // Agrupar por lista
+    var byList = {};
+    allTasks.forEach(function(task) {
+      var ln = task._listName || 'Sin lista';
+      if (!byList[ln]) byList[ln] = [];
+      byList[ln].push(task);
+    });
+
+    tasksList.innerHTML = '';
+    Object.keys(byList).forEach(function(listName) {
+      var title = document.createElement('div');
+      title.className   = 'task-list-title';
+      title.textContent = listName;
+      tasksList.appendChild(title);
+
+      byList[listName].forEach(function(task) {
+        var isDone = task.status === 'completed';
+        var item   = document.createElement('div');
+        item.className = 'task-item' + (isDone ? ' done' : '');
+
+        var check = document.createElement('div');
+        check.className = 'task-check' + (isDone ? ' done' : '');
+        check.textContent = isDone ? '✓' : '';
+
+        var info = document.createElement('div');
+
+        var taskTitle = document.createElement('div');
+        taskTitle.className   = 'task-title' + (isDone ? ' done' : '');
+        taskTitle.textContent = task.title || '(Sin título)';
+        info.appendChild(taskTitle);
+
+        if (task.due) {
+          var due = document.createElement('div');
+          due.className   = 'task-due';
+          due.textContent = '📅 Vence: ' + new Date(task.due).toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long' });
+          info.appendChild(due);
+        }
+
+        item.appendChild(check);
+        item.appendChild(info);
+        tasksList.appendChild(item);
+      });
+    });
+  }
+
+  /* ── EXPORT CSV ── */
+  exportCsvBtn.addEventListener('click', function() {
     var rows = [['Evento','Calendario','Fecha','Hora','Descripción']];
     visible().forEach(function(ev) {
       var dt   = new Date(ev.start.dateTime || ev.start.date);
@@ -451,19 +693,66 @@
         '"' + (ev.description||'').replace(/"/g,'""').replace(/\n/g,' ') + '"',
       ]);
     });
-    var blob = new Blob([rows.map(function(r){return r.join(',');}).join('\n')], { type:'text/csv;charset=utf-8;' });
+    var blob = new Blob([rows.map(function(r){ return r.join(','); }).join('\n')], { type:'text/csv;charset=utf-8;' });
     var a    = document.createElement('a');
     a.href   = URL.createObjectURL(blob);
-    a.download = 'mi-calendario-' + new Date().toISOString().slice(0,10) + '.csv';
+    a.download = 'mi-calendario-' + MONTHS[currentDate.getMonth()] + '-' + currentDate.getFullYear() + '.csv';
     a.click();
   });
 
-  // ── Navegación ──
+  /* ── EXPORT PDF ── */
+  exportPdfBtn.addEventListener('click', function() {
+    var evs = visible().filter(function(ev) {
+      var dt = new Date(ev.start.dateTime || ev.start.date);
+      return dt.getMonth() === currentDate.getMonth() && dt.getFullYear() === currentDate.getFullYear();
+    }).sort(function(a, b) {
+      return new Date(a.start.dateTime || a.start.date) - new Date(b.start.dateTime || b.start.date);
+    });
+
+    var rows = evs.map(function(ev) {
+      var dt    = new Date(ev.start.dateTime || ev.start.date);
+      var time  = ev.start.dateTime ? dt.toLocaleTimeString('es-ES', { hour:'2-digit', minute:'2-digit' }) : 'Todo el día';
+      var color = (calMeta[ev._calId] && calMeta[ev._calId].color) || '#A9BDD9';
+      var cal   = (calMeta[ev._calId] && calMeta[ev._calId].name)  || '';
+      return '<tr>' +
+        '<td style="padding:10px 14px;border-bottom:1px solid #f0f0f0;font-weight:500;color:#333;">' + (ev.summary || '(Sin título)') + '</td>' +
+        '<td style="padding:10px 14px;border-bottom:1px solid #f0f0f0;color:#666;">' + dt.toLocaleDateString('es-ES', { weekday:'short', day:'numeric', month:'short' }) + '</td>' +
+        '<td style="padding:10px 14px;border-bottom:1px solid #f0f0f0;color:#666;">' + time + '</td>' +
+        '<td style="padding:10px 14px;border-bottom:1px solid #f0f0f0;"><span style="background:' + color + '22;color:' + color + ';padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">' + cal + '</span></td>' +
+        '</tr>';
+    }).join('');
+
+    var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
+      '<title>Mi Calendario - ' + MONTHS[currentDate.getMonth()] + ' ' + currentDate.getFullYear() + '</title>' +
+      '<style>body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:40px;color:#333;}' +
+      'h1{font-size:24px;font-weight:600;margin-bottom:6px;background:linear-gradient(135deg,#A9BDD9,#BDAED6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}' +
+      'p{color:#aaa;font-size:13px;margin-bottom:28px;}' +
+      'table{width:100%;border-collapse:collapse;}' +
+      'thead tr{background:linear-gradient(135deg,#A9BDD9,#BDAED6);}' +
+      'thead th{padding:12px 14px;color:white;font-weight:600;font-size:13px;text-align:left;}' +
+      'tbody tr:hover{background:#fafafa;}' +
+      '</style></head><body>' +
+      '<h1>Mi Calendario</h1>' +
+      '<p>' + MONTHS[currentDate.getMonth()] + ' ' + currentDate.getFullYear() + ' · ' + evs.length + ' eventos</p>' +
+      '<table><thead><tr>' +
+      '<th>Evento</th><th>Fecha</th><th>Hora</th><th>Calendario</th>' +
+      '</tr></thead><tbody>' + rows + '</tbody></table>' +
+      '<script>window.onload=function(){window.print();}<\/script>' +
+      '</body></html>';
+
+    var win = window.open('', '_blank');
+    if (win) {
+      win.document.write(html);
+      win.document.close();
+    }
+  });
+
+  /* ── NAVEGACIÓN ── */
   prevBtn.addEventListener('click', function() { currentDate.setMonth(currentDate.getMonth()-1); fetchAll(); });
   nextBtn.addEventListener('click', function() { currentDate.setMonth(currentDate.getMonth()+1); fetchAll(); });
 </script>
 
-<!-- Scripts de Google DESPUÉS del código de la app -->
+<!-- Scripts de Google SIEMPRE al final -->
 <script src="https://apis.google.com/js/api.js" onload="onGapiLoad()"></script>
 <script src="https://accounts.google.com/gsi/client" onload="onGisLoad()"></script>
 
