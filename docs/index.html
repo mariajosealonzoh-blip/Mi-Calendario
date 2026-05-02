@@ -148,17 +148,17 @@
 
     /* ── GRID CALENDARIO ── */
     .cal-wrap { border: 1px solid #eee; border-radius: 12px; padding: 16px; overflow-x: auto; }
-    .wd-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-bottom: 6px; }
+    .wd-row { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; margin-bottom: 4px; }
     .wd { text-align: center; font-size: 11px; font-weight: 700; color: #A9BDD9; padding: 8px 0; text-transform: uppercase; letter-spacing: 0.7px; }
-    .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+    .days-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
     .day-cell {
       background: #fafafa;
       border: 1px solid #eee;
       border-radius: 8px;
-      padding: 9px;
-      min-height: 88px;
+      padding: 6px;
+      min-height: 80px; min-width: 0;
       transition: border-color 0.2s;
-      overflow: visible;
+      overflow: hidden;
     }
     .day-cell:hover { border-color: #A9BDD9; }
     .day-cell.faded { opacity: 0.3; }
@@ -306,7 +306,7 @@
   const DISC_TASKS = 'https://www.googleapis.com/discovery/v1/apis/tasks/v1/rest';
   const PALETTE    = ['#A9BDD9','#BDAED6','#E6B0C2','#BFD8C8','#EDE2B8','#B8D8D8'];
   const MONTHS     = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-  const DAYS       = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+  const DAYS       = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
 
   var tokenClient;
   var gapiReady     = false;
@@ -536,7 +536,7 @@
 
     monthTitle.textContent = MONTHS[currentDate.getMonth()] + ' ' + currentDate.getFullYear();
 
-    var firstWD     = (new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay() + 6) % 7;
+    var firstWD     = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
     var daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
     var prevTotal   = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0).getDate();
     var today       = new Date();
@@ -548,8 +548,15 @@
       var date    = new Date(currentDate.getFullYear(), currentDate.getMonth(), d);
       var isToday = date.toDateString() === today.toDateString();
       var evs     = visible().filter(function(ev) {
-        var dt = new Date(ev.start.dateTime || ev.start.date);
-        return dt.toDateString() === date.toDateString();
+        if (ev.start.dateTime) {
+          var dt = new Date(ev.start.dateTime);
+          return dt.toDateString() === date.toDateString();
+        } else {
+          var parts = ev.start.date.split('-');
+          return parseInt(parts[0]) === date.getFullYear() &&
+                 parseInt(parts[1]) - 1 === date.getMonth() &&
+                 parseInt(parts[2]) === date.getDate();
+        }
       });
       daysGrid.appendChild(makeCell(d, false, isToday, evs));
     }
