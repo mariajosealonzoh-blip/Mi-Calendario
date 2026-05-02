@@ -306,7 +306,7 @@
   const DISC_TASKS = 'https://www.googleapis.com/discovery/v1/apis/tasks/v1/rest';
   const PALETTE    = ['#A9BDD9','#BDAED6','#E6B0C2','#BFD8C8','#EDE2B8','#B8D8D8'];
   const MONTHS     = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-  const DAYS       = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const DAYS       = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
 
   var tokenClient;
   var gapiReady     = false;
@@ -536,13 +536,13 @@
 
     monthTitle.textContent = MONTHS[currentDate.getMonth()] + ' ' + currentDate.getFullYear();
 
-    var firstWD     = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
+    var firstWD     = (new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay() + 6) % 7;
     var daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
     var prevTotal   = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0).getDate();
     var today       = new Date();
 
-    for (var i = firstWD - 1; i >= 0; i--)
-      daysGrid.appendChild(makeCell(prevTotal - i, true, false, []));
+    for (var i = 0; i < firstWD; i++)
+      daysGrid.appendChild(makeCell(prevTotal - firstWD + 1 + i, true, false, []));
 
     for (var d = 1; d <= daysInMonth; d++) {
       var date    = new Date(currentDate.getFullYear(), currentDate.getMonth(), d);
